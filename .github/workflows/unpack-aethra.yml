@@ -1,0 +1,58 @@
+name: Unpack Aethra ZIP
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "*.zip"
+      - "**/*.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract ZIP into repository
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ZIP_FILE="$(find . -type f -iname '*.zip' -not -path './.git/*' -print -quit)"
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ZIP archive not found."
+            exit 1
+          fi
+
+          mkdir -p /tmp/aethra-extract
+          unzip -q "$ZIP_FILE" -d /tmp/aethra-extract
+
+          shopt -s dotglob nullglob
+          items=(/tmp/aethra-extract/*)
+          if [ "${#items[@]}" -eq 1 ] && [ -d "${items[0]}" ]; then
+            SOURCE="${items[0]}"
+          else
+            SOURCE="/tmp/aethra-extract"
+          fi
+
+          cp -a "$SOURCE"/. .
+          rm -f "$ZIP_FILE"
+
+      - name: Commit extracted project files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No extracted changes to commit."
+          else
+            git commit -m "Unpack Aethra project ZIP"
+            git push
+          fi
