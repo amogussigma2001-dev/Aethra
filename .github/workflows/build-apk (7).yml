@@ -1,0 +1,41 @@
+name: Build Aethra APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Подготовить проект
+        run: |
+          mkdir -p www assets
+          cp index.html shim.js config.js www/
+          cp icon-only.png icon-foreground.png icon-background.png assets/
+          npm install
+          npx cap add android
+          npx capacitor-assets generate --android
+      - name: Собрать APK
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug
+      - name: Назвать файл Aethra.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Aethra.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Aethra
+          path: Aethra.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Aethra v${{ github.run_number }}
+          files: Aethra.apk
