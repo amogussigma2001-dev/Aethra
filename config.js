@@ -1,6 +1,4 @@
 window.AETHRA_CONFIG = {
-  // Адрес общей базы данных (Firebase Realtime Database), например:
-  // "https://aethra-12345-default-rtdb.europe-west1.firebasedatabase.app"
-  // Пусто — приложение работает только на этом телефоне.
-  FIREBASE_URL: ""
+  // Адрес общей базы данных Firebase
+  FIREBASE_URL: "https://aethra-67a99-default-rtdb.firebaseio.com"
 };
