@@ -1,0 +1,9 @@
+{
+  "appId": "com.aethra.app",
+  "appName": "Aethra",
+  "webDir": "www",
+  "server": {
+    "url": "https://claude.ai/artifact/1EMPSgcRhhRBRPefWqEphD",
+    "allowNavigation": ["claude.ai", "*.claude.ai", "claude.com", "*.claude.com", "*.anthropic.com"]
+  }
+}
